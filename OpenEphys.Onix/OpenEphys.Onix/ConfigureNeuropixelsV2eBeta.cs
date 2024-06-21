@@ -246,4 +246,17 @@ namespace OpenEphys.Onix
             }
         }
     }
+
+    [Flags]
+    enum NeuropixelsV2eBetaStatus : uint
+    {
+        SR_OK = 1 << 7 // Indicates the SR chain comparison is OK
+    }
+
+    public enum NeuropixelsV2eBetaChannelReference : uint
+    {
+        External,
+        Tip,
+        Internal
+    }
 }
