@@ -1,12 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing.Design;
+using System.Text;
 using System.Threading;
+using Bonsai;
+using Newtonsoft.Json;
+using System.Xml.Serialization;
 
 namespace OpenEphys.Onix
 {
+    [DefaultProperty(nameof(ChannelConfiguration))]
     public class ConfigureHeadstageRhs2116 : HubDeviceFactory
     {
         PortName port;
+        Rhs2116ProbeGroup probeGroup = new();
         readonly ConfigureHeadstageRhs2116LinkController LinkController = new();
 
         public ConfigureHeadstageRhs2116()
@@ -16,6 +24,7 @@ namespace OpenEphys.Onix
             // Whats worse: the port voltage can only go down to 3.3V, which means that its very hard to find the true lowest voltage
             // for a lock and then add a large offset to that.
             Port = PortName.PortA;
+            ChannelConfiguration = probeGroup;
             LinkController.HubConfiguration = HubConfiguration.Standard;
         }
 
@@ -50,6 +59,31 @@ namespace OpenEphys.Onix
                 Rhs2116A.DeviceAddress = offset + 0;
                 Rhs2116B.DeviceAddress = offset + 1;
                 StimulusTrigger.DeviceAddress = offset + 2;
+            }
+        }
+
+        [XmlIgnore]
+        [Editor("OpenEphys.Onix.Design.HeadstageRhs2116Editor, OpenEphys.Onix.Design", typeof(UITypeEditor))]
+        public Rhs2116ProbeGroup ChannelConfiguration
+        {
+            get { return probeGroup; }
+            set { probeGroup = value; }
+        }
+
+        [Browsable(false)]
+        [Externalizable(false)]
+        [XmlElement(nameof(ChannelConfiguration))]
+        public string ChannelConfigurationString
+        {
+            get
+            {
+                var jsonString = JsonConvert.SerializeObject(ChannelConfiguration);
+                return Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonString));
+            }
+            set
+            {
+                var jsonString = Encoding.UTF8.GetString(Convert.FromBase64String(value));
+                ChannelConfiguration = JsonConvert.DeserializeObject<Rhs2116ProbeGroup>(jsonString);
             }
         }
 
