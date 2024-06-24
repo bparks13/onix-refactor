@@ -91,25 +91,45 @@ namespace OpenEphys.Onix
         public uint MaxWriteFrameSize { get; private set; }
         public Dictionary<uint, oni.Device> DeviceTable { get; private set; }
 
+        void AssertConfigurationContext()
+        {
+            if (running)
+            {
+                throw new InvalidOperationException("Configuration cannot be changed while acquisition context is running.");
+            }
+        }
+
         // NB: This is where actions that reconfigure the hub state, or otherwise
         // change the device table should be executed
-        internal void ConfigureHost(Func<ContextTask, IDisposable> action)
+        internal void ConfigureHost(Func<ContextTask, IDisposable> configure)
         {
-            configureHost += action;
+            lock (regLock)
+            {
+                AssertConfigurationContext();
+                configureHost += configure;
+            }
         }
 
         // NB: This is where actions that calibrate port voltage or otherwise
         // check link lock state should be executed
-        internal void ConfigureLink(Func<ContextTask, IDisposable> action)
+        internal void ConfigureLink(Func<ContextTask, IDisposable> configure)
         {
-            configureLink += action;
+            lock (regLock)
+            {
+                AssertConfigurationContext();
+                configureLink += configure;
+            }
         }
 
         // NB: Actions queued using this method should assume that the device table
         // is finalized and cannot be changed
-        internal void ConfigureDevice(Func<ContextTask, IDisposable> selector)
+        internal void ConfigureDevice(Func<ContextTask, IDisposable> configure)
         {
-            configureDevice += selector;
+            lock (regLock)
+            {
+                AssertConfigurationContext();
+                configureDevice += configure;
+            }
         }
 
         private IDisposable ConfigureContext()
@@ -145,7 +165,7 @@ namespace OpenEphys.Onix
             }
         }
 
-        internal void Start()
+        internal void Start(int blockReadSize, int blockWriteSize)
         {
             lock (regLock)
             {
@@ -153,6 +173,8 @@ namespace OpenEphys.Onix
 
                 // NB: Configure context before starting acquisition
                 ContextConfiguration = ConfigureContext();
+                ctx.BlockReadSize = blockReadSize;
+                ctx.BlockWriteSize = blockWriteSize;
 
                 // NB: Stuff related to sync mode is 100% ONIX, not ONI, so long term another place
                 // to do this separation might be needed
@@ -225,9 +247,9 @@ namespace OpenEphys.Onix
                 CollectFramesToken,
                 TaskCreationOptions.LongRunning,
                 TaskScheduler.Default);
-            }
 
-            running = true;
+                running = true;
+            }
         }
 
         internal void Stop()
@@ -289,10 +311,6 @@ namespace OpenEphys.Onix
             {
                 return ctx.BlockReadSize;
             }
-            set
-            {
-                ctx.BlockReadSize = value;
-            }
         }
 
         public int BlockWriteSize
@@ -300,10 +318,6 @@ namespace OpenEphys.Onix
             get
             {
                 return ctx.BlockWriteSize;
-            }
-            set
-            {
-                ctx.BlockWriteSize = value;
             }
         }
 
