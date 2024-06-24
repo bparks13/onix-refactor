@@ -31,12 +31,12 @@ namespace OpenEphys.Onix
         [TypeConverter(typeof(HubDeviceConverter))]
         public ConfigureRhs2116Trigger StimulusTrigger { get; set; } = new();
 
-        internal override void UpdateDeviceNames(string hubName)
+        internal override void UpdateDeviceNames()
         {
-            LinkController.DeviceName = $"{hubName}/{nameof(LinkController)}";
-            Rhs2116A.DeviceName = $"{hubName}/{nameof(Rhs2116A)}";
-            Rhs2116B.DeviceName = $"{hubName}/{nameof(Rhs2116B)}";
-            StimulusTrigger.DeviceName = $"{hubName}/{nameof(StimulusTrigger)}";
+            LinkController.DeviceName = GetFullDeviceName(nameof(LinkController));
+            Rhs2116A.DeviceName = GetFullDeviceName(nameof(Rhs2116A));
+            Rhs2116B.DeviceName = GetFullDeviceName(nameof(Rhs2116B));
+            StimulusTrigger.DeviceName = GetFullDeviceName(nameof(StimulusTrigger));
         }
 
         public PortName Port

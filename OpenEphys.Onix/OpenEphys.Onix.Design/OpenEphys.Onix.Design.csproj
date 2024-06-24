@@ -11,9 +11,12 @@
 
   <ItemGroup>
     <PackageReference Include="Bonsai.Core" Version="2.8.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="ZedGraph" Version="5.1.7" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\OpenEphys.ProbeInterface\OpenEphys.ProbeInterface\OpenEphys.ProbeInterface\OpenEphys.ProbeInterface.csproj" />
     <ProjectReference Include="..\OpenEphys.Onix\OpenEphys.Onix.csproj" />
   </ItemGroup>
 
