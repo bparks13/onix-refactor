@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
@@ -87,6 +87,15 @@ namespace OpenEphys.Onix
             }
         }
 
+        [Description("If defined, it will override automated voltage discovery and apply the specified voltage" +
+                     "to the headstage. Warning: this device requires 3.4V to 4.4V for proper operation." +
+                     "Supplying higher voltages may result in damage to the headstage.")]
+        public double? PortVoltage
+        {
+            get => LinkController.PortVoltage;
+            set => LinkController.PortVoltage = value;
+        }
+
         internal override IEnumerable<IDeviceConfiguration> GetDevices()
         {
             yield return LinkController;
@@ -99,40 +108,38 @@ namespace OpenEphys.Onix
         {
             protected override bool ConfigurePortVoltage(DeviceContext device)
             {
-                const uint MinVoltage = 33;
-                const uint MaxVoltage = 50;
-                const uint VoltageOffset = 25;
-                const uint VoltageIncrement = 02;
+                const double MinVoltage = 3.3;
+                const double MaxVoltage = 4.4;
+                const double VoltageOffset = 2.0;
+                const double VoltageIncrement = 0.2;
 
-                for (uint voltage = MinVoltage; voltage <= MaxVoltage; voltage += VoltageIncrement)
+                for (var voltage = MinVoltage; voltage <= MaxVoltage; voltage += VoltageIncrement)
                 {
                     SetPortVoltage(device, voltage);
-                    if (CheckLinkState(device))
+                    if (base.CheckLinkState(device))
                     {
                         SetPortVoltage(device, voltage + VoltageOffset);
-                        if (CheckLinkState(device))
-                        {
-                            // TODO: The RHS2116 headstage needs an additional reset after power on
-                            // to provide its device table.
-                            Thread.Sleep(500);
-                            device.Context.Reset();
-                            return true;
-                        }
-                        else break;
+                        return CheckLinkState(device);
                     }
                 }
 
                 return false;
             }
 
-            private void SetPortVoltage(DeviceContext device, uint voltage)
+            private void SetPortVoltage(DeviceContext device, double voltage)
             {
-                const int WaitUntilVoltageOffSettles = 500;
-                const int WaitUntilVoltageOnSettles = 500;
                 device.WriteRegister(FmcLinkController.PORTVOLTAGE, 0);
-                Thread.Sleep(WaitUntilVoltageOffSettles);
-                device.WriteRegister(FmcLinkController.PORTVOLTAGE, voltage);
-                Thread.Sleep(WaitUntilVoltageOnSettles);
+                Thread.Sleep(500);
+                device.WriteRegister(FmcLinkController.PORTVOLTAGE, (uint)(10 * voltage));
+                Thread.Sleep(500);
+            }
+
+            protected override bool CheckLinkState(DeviceContext device)
+            {
+                // NB: The RHS2116 headstage needs an additional reset after power on to provide its device table.
+                device.Context.Reset();
+                var linkState = device.ReadRegister(FmcLinkController.LINKSTATE);
+                return (linkState & FmcLinkController.LINKSTATE_SL) != 0;
             }
         }
     }
