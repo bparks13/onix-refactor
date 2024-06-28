@@ -2,10 +2,14 @@
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Reactive.Subjects;
+using Bonsai;
+using Newtonsoft.Json;
+using System.Text;
+using System.Xml.Serialization;
 
 namespace OpenEphys.Onix
 {
-    [DefaultProperty(nameof(StimulusSequence))]
+    [Editor("OpenEphys.Onix.Design.Rhs2116StimulusSequenceEditor, OpenEphys.Onix.Design", typeof(ComponentEditor))]
     public class ConfigureRhs2116Trigger : SingleDeviceFactory
     {
         readonly BehaviorSubject<Rhs2116StimulusSequenceDual> stimulusSequence = new(new Rhs2116StimulusSequenceDual());
@@ -18,6 +22,28 @@ namespace OpenEphys.Onix
         [Category(ConfigurationCategory)]
         [Description("Specifies whether the RHS2116 device is enabled.")]
         public Rhs2116TriggerSource TriggerSource { get; set; } = Rhs2116TriggerSource.Local;
+
+        [XmlIgnore]
+        [Category(ConfigurationCategory)]
+        [Description("Defines the channel configuration")]
+        public Rhs2116ProbeGroup ChannelConfiguration { get; set; } = new();
+
+        [Browsable(false)]
+        [Externalizable(false)]
+        [XmlElement(nameof(ChannelConfiguration))]
+        public string ChannelConfigurationString
+        {
+            get
+            {
+                var jsonString = JsonConvert.SerializeObject(ChannelConfiguration);
+                return Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonString));
+            }
+            set
+            {
+                var jsonString = Encoding.UTF8.GetString(Convert.FromBase64String(value));
+                ChannelConfiguration = JsonConvert.DeserializeObject<Rhs2116ProbeGroup>(jsonString);
+            }
+        }
 
         [Category("Acquisition")]
         [Description("Stimulus sequence.")]

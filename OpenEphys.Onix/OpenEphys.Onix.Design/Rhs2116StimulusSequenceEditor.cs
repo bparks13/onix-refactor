@@ -1,47 +1,32 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Drawing.Design;
 using System.Windows.Forms;
-using System.Windows.Forms.Design;
+using Bonsai.Design;
 
 namespace OpenEphys.Onix.Design
 {
-    public class Rhs2116StimulusSequenceEditor : UITypeEditor
+    public class Rhs2116StimulusSequenceEditor : WorkflowComponentEditor
     {
-        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+        public override bool EditComponent(ITypeDescriptorContext context, object component, IServiceProvider provider, IWin32Window owner)
         {
-            return UITypeEditorEditStyle.Modal;
-        }
-
-        public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
-        {
-            var editorService = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
-
-            if (editorService != null)
+            if (provider != null)
             {
-                Rhs2116ProbeGroup probeGroup = null;
-
-                if (context.Instance is ConfigureRhs2116Trigger)
+                var editorState = (IWorkflowEditorState)provider.GetService(typeof(IWorkflowEditorState));
+                if (editorState != null && !editorState.WorkflowRunning && component is ConfigureRhs2116Trigger configureNode)
                 {
-                    probeGroup = new Rhs2116ProbeGroup();
-                }
-                else if (context.Instance is ConfigureHeadstageRhs2116 configureHeadstageRhs2116)
-                {
-                    probeGroup = configureHeadstageRhs2116.ChannelConfiguration;
-                }
+                    using var editorDialog = new Rhs2116StimulusSequenceDialog(configureNode.StimulusSequence, configureNode.ChannelConfiguration);
 
-                var editorDialog = new Rhs2116StimulusSequenceDialog(value as Rhs2116StimulusSequenceDual, probeGroup);
-                
-                if (editorDialog.ShowDialog() == DialogResult.OK)
-                {
-                    if (editorDialog.Sequence.Valid)
-                        return editorDialog.Sequence;
+                    if (editorDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        configureNode.StimulusSequence = editorDialog.Sequence;
+                        configureNode.ChannelConfiguration = (Rhs2116ProbeGroup)editorDialog.ChannelConfiguration.GetProbeGroup();
 
-                    MessageBox.Show("Warning: Sequence was not valid; all settings were discarded.");
+                        return true;
+                    }
                 }
             }
 
-            return base.EditValue(context, provider, value);
+            return false;
         }
     }
 }

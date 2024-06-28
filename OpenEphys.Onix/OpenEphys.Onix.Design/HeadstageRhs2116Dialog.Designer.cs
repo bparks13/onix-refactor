@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.tabControl = new System.Windows.Forms.TabControl();
-            this.tabPageChannelConfiguration = new System.Windows.Forms.TabPage();
             this.tabPageStimulusSequence = new System.Windows.Forms.TabPage();
             this.tabPageRhs2116A = new System.Windows.Forms.TabPage();
             this.buttonCancel = new System.Windows.Forms.Button();
@@ -45,7 +44,6 @@
             // 
             // tabControl
             // 
-            this.tabControl.Controls.Add(this.tabPageChannelConfiguration);
             this.tabControl.Controls.Add(this.tabPageStimulusSequence);
             this.tabControl.Controls.Add(this.tabPageRhs2116A);
             this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -54,17 +52,6 @@
             this.tabControl.SelectedIndex = 0;
             this.tabControl.Size = new System.Drawing.Size(1894, 877);
             this.tabControl.TabIndex = 0;
-            this.tabControl.Selected += new System.Windows.Forms.TabControlEventHandler(this.TabPage_Selected);
-            // 
-            // tabPageChannelConfiguration
-            // 
-            this.tabPageChannelConfiguration.Location = new System.Drawing.Point(4, 29);
-            this.tabPageChannelConfiguration.Name = "tabPageChannelConfiguration";
-            this.tabPageChannelConfiguration.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageChannelConfiguration.Size = new System.Drawing.Size(1886, 844);
-            this.tabPageChannelConfiguration.TabIndex = 0;
-            this.tabPageChannelConfiguration.Text = "Channel Configuration";
-            this.tabPageChannelConfiguration.UseVisualStyleBackColor = true;
             // 
             // tabPageStimulusSequence
             // 
@@ -95,7 +82,6 @@
             this.buttonCancel.TabIndex = 6;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
-            this.buttonCancel.Click += new System.EventHandler(this.OnClickCancel);
             // 
             // buttonOK
             // 
@@ -161,7 +147,6 @@
         #endregion
 
         private System.Windows.Forms.TabControl tabControl;
-        private System.Windows.Forms.TabPage tabPageChannelConfiguration;
         private System.Windows.Forms.TabPage tabPageStimulusSequence;
         private System.Windows.Forms.TabPage tabPageRhs2116A;
         private System.Windows.Forms.Button buttonCancel;

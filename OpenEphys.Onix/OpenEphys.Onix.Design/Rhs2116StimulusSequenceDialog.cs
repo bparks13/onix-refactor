@@ -14,23 +14,16 @@ namespace OpenEphys.Onix.Design
         /// </summary>
         public Rhs2116StimulusSequenceDual Sequence;
 
-        private Rhs2116ProbeGroup ChannelConfiguration;
+        public readonly Rhs2116ChannelConfigurationDialog ChannelConfiguration;
 
         private const double SamplePeriodMicroSeconds = 1e6 / 30.1932367151e3;
-
-        private readonly bool[] SelectedChannels = null;
-
-        private const string SelectionAreaTag = "Selection";
-
-        private PointD mouseLocation = new(0.0, 0.0);
-        private PointD clickStart = new(0.0, 0.0);
 
         /// <summary>
         /// Opens a dialog allowing for easy changing of stimulus sequence parameters
         /// </summary>
         /// <param name="sequence"></param>
-        /// <param name="channelConfiguration"></param>
-        public Rhs2116StimulusSequenceDialog(Rhs2116StimulusSequenceDual sequence, Rhs2116ProbeGroup channelConfiguration)
+        /// <param name="probeGroup"></param>
+        public Rhs2116StimulusSequenceDialog(Rhs2116StimulusSequenceDual sequence, Rhs2116ProbeGroup probeGroup)
         {
             InitializeComponent();
             Shown += FormShown;
@@ -39,23 +32,26 @@ namespace OpenEphys.Onix.Design
 
             propertyGridStimulusSequence.SelectedObject = Sequence;
 
-            SelectedChannels = new bool[Sequence.Stimuli.Length];
-            SetAllChannels(true);
-
             comboBoxStepSize.DataSource = Enum.GetValues(typeof(Rhs2116StepSize));
             comboBoxStepSize.SelectedIndex = (int)Sequence.CurrentStepSize;
 
-            if (channelConfiguration == null || channelConfiguration.NumberOfContacts != 32)
+            if (probeGroup.NumberOfContacts != 32)
             {
-                MessageBox.Show("Error: Something is wrong with the channel configuration." +
-                    "Using the default channel configuration for now.");
-                channelConfiguration = new();
+                throw new ArgumentException($"Probe group is not valid: 32 channels were expected, there are {probeGroup.NumberOfContacts} instead.");
             }
 
-            ChannelConfiguration = channelConfiguration;
+            ChannelConfiguration = new(probeGroup)
+            {
+                TopLevel = false,
+                FormBorderStyle = FormBorderStyle.None,
+                Dock = DockStyle.Fill,
+                Parent = this,
+            };
 
-            InitializeZedGraphChannels();
-            DrawChannels();
+            panelProbe.Controls.Add(ChannelConfiguration);
+            this.AddMenuItemsFromDialogToFileOption(ChannelConfiguration, "Channel Configuration");
+
+            ChannelConfiguration.Show();
 
             InitializeZedGraphWaveform();
             DrawStimulusWaveform();
@@ -130,7 +126,8 @@ namespace OpenEphys.Onix.Design
         private void PropertyGridStimulusSequence_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
             DrawStimulusWaveform();
-            VisualizeSelectedChannels();
+
+            // TODO: Add a call to the Rhs2116ChannelConfigurationDialog here to update channels
         }
 
         private void DrawStimulusWaveform()
@@ -154,7 +151,7 @@ namespace OpenEphys.Onix.Design
 
             for (int i = 0; i < stimuli.Length; i++)
             {
-                if (SelectedChannels[i])
+                if (ChannelConfiguration.SelectedContacts[i])
                 {
                     PointPairList pointPairs = CreateStimulusWaveform(stimuli[i], -peakToPeak * i);
 
@@ -249,14 +246,6 @@ namespace OpenEphys.Onix.Design
             zedGraphWaveform.IsAutoScrollRange = true;
         }
 
-        private void InitializeZedGraphChannels()
-        {
-            ChannelConfigurationDialog.InitializeZedGraphChannels(zedGraphChannels);
-
-            zedGraphChannels.ZoomButtons = MouseButtons.None;
-            zedGraphChannels.ZoomButtons2 = MouseButtons.None;
-        }
-
         private void SetStatusValidity()
         {
             if (Sequence.Valid && Sequence.FitsInHardware)
@@ -284,11 +273,6 @@ namespace OpenEphys.Onix.Design
             toolStripStatusSlotsUsed.Text = string.Format("{0, 0:P1} of slots used", (double)Sequence.StimulusSlotsRequired / Sequence.MaxMemorySlotsAvailable);
         }
 
-        private void DrawChannels()
-        {
-            ChannelConfigurationDialog.DrawChannels(zedGraphChannels, ChannelConfiguration);
-        }
-
         private void LinkLabelDocumentation_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             try
@@ -303,112 +287,9 @@ namespace OpenEphys.Onix.Design
             }
         }
 
-        private void ZedGraphChannels_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (e.Button != MouseButtons.Left || zedGraphChannels.GraphPane.GraphObjList[SelectionAreaTag] is BoxObj)
-                return;
-
-            PointF mouseClick = new(e.X, e.Y);
-
-            if (zedGraphChannels.GraphPane.FindNearestObject(mouseClick, CreateGraphics(), out object nearestObject, out int _))
-            {
-                if (nearestObject is TextObj textObj)
-                {
-                    ToggleSelectedChannel(textObj.Tag.ToString());
-                }
-                else if (nearestObject is EllipseObj circleObj)
-                {
-                    ToggleSelectedChannel(circleObj.Tag.ToString());
-                }
-                else
-                {
-                    SetAllChannels(true);
-                }
-            }
-            else
-            {
-                SetAllChannels(true);
-            }
-
-            VisualizeSelectedChannels();
-            DrawStimulusWaveform();
-        }
-
-        private void ToggleSelectedChannel(string tag)
-        {
-            if (SelectedChannels.All(x => x))
-                SetAllChannels(false);
-
-            string[] words = tag.Split('_');
-            if (int.TryParse(words[1], out int num))
-            {
-                SelectedChannels[num] = !SelectedChannels[num];
-            }
-            else
-            {
-                MessageBox.Show("Warning: Invalid channel tag detected.");
-            }
-        }
-        private void SetSelectedChannel(string tag, bool status)
-        {
-            if (SelectedChannels.All(x => x))
-                SetAllChannels(false);
-
-            string[] words = tag.Split('_');
-            if (int.TryParse(words[1], out int num))
-            {
-                SelectedChannels[num] = status;
-            }
-            else
-            {
-                MessageBox.Show("Warning: Invalid channel tag detected.");
-            }
-        }
-
-        private void VisualizeSelectedChannels()
-        {
-            if (SelectedChannels.All(x => !x))
-            {
-                SetAllChannels(true);
-            }
-
-            bool showAllChannels = SelectedChannels.All(x => x);
-
-            for (int i = 0; i < SelectedChannels.Length; i++)
-            {
-                EllipseObj circleObj = (EllipseObj)zedGraphChannels.GraphPane.GraphObjList[string.Format(ChannelConfigurationDialog.ContactStringFormat, i)];
-
-                if (circleObj != null)
-                {
-                    if (!Sequence.Stimuli[i].IsValid())
-                    {
-                        circleObj.Fill.Color = Color.Red;
-                    }
-                    else if (showAllChannels || !SelectedChannels[i])
-                    {
-                        circleObj.Fill.Color = Color.White;
-                    }
-                    else
-                    {
-                        circleObj.Fill.Color = Color.SlateGray;
-                    }
-                }
-            }
-
-            zedGraphChannels.Refresh();
-        }
-
-        private void SetAllChannels(bool status)
-        {
-            for (int i = 0; i < SelectedChannels.Length; i++)
-            {
-                SelectedChannels[i] = status;
-            }
-        }
-
         private void ButtonAddPulses_Click(object sender, EventArgs e)
         {
-            if (SelectedChannels.All(x => x))
+            if (ChannelConfiguration.SelectedContacts.All(x => x))
             {
                 DialogResult result = MessageBox.Show("Caution: All channels are currently selected, and all " +
                     "settings will be applied to all channels if you continue. Press Okay to add pulse settings to all channels, or Cancel to keep them as is",
@@ -420,10 +301,11 @@ namespace OpenEphys.Onix.Design
                 }
             }
 
-            for (int i = 0; i < SelectedChannels.Length; i++)
+            for (int i = 0; i < ChannelConfiguration.SelectedContacts.Length; i++)
             {
-                if (SelectedChannels[i])
+                if (ChannelConfiguration.SelectedContacts[i])
                 {
+                    // TODO: Add default values automatically, and display them if they were removed
                     if (delay.Tag == null)
                     {
                         MessageBox.Show("Unable to parse delay.");
@@ -491,7 +373,7 @@ namespace OpenEphys.Onix.Design
             }
 
             DrawStimulusWaveform();
-            VisualizeSelectedChannels();
+            ChannelConfiguration.HighlightEnabledContacts();
         }
 
         private void ParameterKeyPress_Time(object sender, KeyPressEventArgs e)
@@ -515,7 +397,7 @@ namespace OpenEphys.Onix.Design
             dataGridViewStimulusTable.BindingContext[dataGridViewStimulusTable.DataSource].EndCurrentEdit();
             AddDeviceChannelIndexToGridRow();
             DrawStimulusWaveform();
-            VisualizeSelectedChannels();
+            ChannelConfiguration.HighlightEnabledContacts();
         }
 
         private void DataGridViewStimulusTable_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
@@ -525,10 +407,10 @@ namespace OpenEphys.Onix.Design
 
         private void AddDeviceChannelIndexToGridRow()
         {
-            if (ChannelConfiguration == null || ChannelConfiguration.NumberOfContacts != 32)
+            if (ChannelConfiguration == null || ChannelConfiguration.GetProbeGroup().NumberOfContacts != 32)
                 return;
 
-            var deviceChannelIndices = ChannelConfiguration.GetDeviceChannelIndices();
+            var deviceChannelIndices = ChannelConfiguration.GetProbeGroup().GetDeviceChannelIndices();
 
             for (int i = 0; i < deviceChannelIndices.Count(); i++)
             {
@@ -751,7 +633,7 @@ namespace OpenEphys.Onix.Design
 
         private void ButtonClearPulses_Click(object sender, EventArgs e)
         {
-            if (SelectedChannels.All(x => x))
+            if (ChannelConfiguration.SelectedContacts.All(x => x == false) || ChannelConfiguration.SelectedContacts.All(x => x == true))
             {
                 DialogResult result = MessageBox.Show("Caution: All channels are currently selected, and all " +
                     "settings will be cleared if you continue. Press Okay to clear all pulse settings, or Cancel to keep them",
@@ -763,9 +645,9 @@ namespace OpenEphys.Onix.Design
                 }
             }
 
-            for (int i = 0; i < SelectedChannels.Length; i++)
+            for (int i = 0; i < ChannelConfiguration.SelectedContacts.Length; i++)
             {
-                if (SelectedChannels[i])
+                if (ChannelConfiguration.SelectedContacts[i])
                 {
                     Sequence.Stimuli[i].Clear();
                 }
@@ -774,134 +656,19 @@ namespace OpenEphys.Onix.Design
             DrawStimulusWaveform();
         }
 
-        private bool ZedGraphChannels_MouseDownEvent(ZedGraphControl sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                clickStart = TransformPixelsToCoordinates(e.Location);
-            }
-
-            return false;
-        }
-
-        private bool ZedGraphChannels_MouseMoveEvent(ZedGraphControl sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                if (zedGraphChannels.Cursor != Cursors.Cross)
-                {
-                    zedGraphChannels.Cursor = Cursors.Cross;
-                }
-
-                mouseLocation = TransformPixelsToCoordinates(e.Location);
-
-                BoxObj selectionArea = new(
-                    mouseLocation.X < clickStart.X ? mouseLocation.X : clickStart.X,
-                    mouseLocation.Y > clickStart.Y ? mouseLocation.Y : clickStart.Y,
-                    Math.Abs(mouseLocation.X - clickStart.X),
-                    Math.Abs(mouseLocation.Y - clickStart.Y));
-                selectionArea.Border.Color = Color.DarkSlateGray;
-                selectionArea.Fill.IsVisible = false;
-                selectionArea.ZOrder = ZOrder.A_InFront;
-                selectionArea.Tag = SelectionAreaTag;
-
-                BoxObj oldArea = (BoxObj)zedGraphChannels.GraphPane.GraphObjList[SelectionAreaTag];
-                if (oldArea != null)
-                {
-                    zedGraphChannels.GraphPane.GraphObjList.Remove(oldArea);
-                }
-
-                zedGraphChannels.GraphPane.GraphObjList.Add(selectionArea);
-                zedGraphChannels.Refresh();
-
-                return true;
-            }
-            else if (e.Button == MouseButtons.None)
-            {
-                zedGraphChannels.Cursor = Cursors.Arrow;
-
-                return true;
-            }
-            else if (e.Button == MouseButtons.Middle)
-            {
-                return false;
-            }
-
-            return false;
-        }
-
-        private PointD TransformPixelsToCoordinates(Point pixels)
-        {
-            zedGraphChannels.GraphPane.ReverseTransform(pixels, out double x, out double y);
-
-            return new PointD(x, y);
-        }
-
-        private bool ZedGraphChannels_MouseUpEvent(ZedGraphControl sender, MouseEventArgs e)
-        {
-            if (zedGraphChannels.GraphPane.GraphObjList[SelectionAreaTag] is BoxObj selectionArea && selectionArea != null &&
-                ChannelConfiguration != null && ChannelConfiguration.NumberOfContacts == 32)
-            {
-                RectangleF rect = selectionArea.Location.Rect;
-
-                if (!rect.IsEmpty)
-                {
-                    var deviceChannelIndices = ChannelConfiguration.GetDeviceChannelIndices();
-
-                    foreach (int id in deviceChannelIndices)
-                    {
-                        if (zedGraphChannels.GraphPane.GraphObjList[string.Format(ChannelConfigurationDialog.ContactStringFormat, id)]
-                            is EllipseObj contact && contact != null)
-                        {
-                            if (Contains(rect, contact.Location))
-                            {
-                                SetSelectedChannel(contact.Tag as string, true);
-                            }
-                        }
-                    }
-                }
-
-                zedGraphChannels.GraphPane.GraphObjList.Remove(selectionArea);
-
-                VisualizeSelectedChannels();
-                DrawStimulusWaveform();
-            }
-
-            return true;
-        }
-
-        private bool Contains(RectangleF rect, Location location)
-        {
-            if (!rect.IsEmpty)
-            {
-                if (location != null)
-                {
-                    var x = location.X + location.Width / 2;
-                    var y = location.Y - location.Height / 2;
-
-                    if (x >= rect.X && x <= rect.X + rect.Width && y <= rect.Y && y >= rect.Y - rect.Height)
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
         private void ButtonReadPulses_Click(object sender, EventArgs e)
         {
-            if (SelectedChannels.Count(x => x) > 1)
+            if (ChannelConfiguration.SelectedContacts.Count(x => x) > 1)
             {
-                MessageBox.Show("Too many contacts selected. Please choose a single channel to read from.");
+                MessageBox.Show("Too many contacts selected. Please choose a single contact to read from.");
                 return;
             }
 
             int index = -1;
 
-            for (int i = 0; i < SelectedChannels.Length; i++)
+            for (int i = 0; i < ChannelConfiguration.SelectedContacts.Length; i++)
             {
-                if (SelectedChannels[i])
+                if (ChannelConfiguration.SelectedContacts[i])
                 {
                     index = i; break;
                 }
@@ -983,39 +750,6 @@ namespace OpenEphys.Onix.Design
 
                 DrawStimulusWaveform();
             }
-        }
-
-        private void ZedGraphChannels_Resize(object sender, EventArgs e)
-        {
-            ChannelConfigurationDialog.ResizeAxes(zedGraphChannels);
-            zedGraphChannels.Refresh();
-        }
-
-        /// <summary>
-        /// Used to update the internal Rhs2116ProbeGroup while the form is active
-        /// </summary>
-        /// <param name="channelConfiguration"></param>
-        /// <returns>True if the ChannelConfiguration was added, false if the incoming channel configuration is invalid for some reason</returns>
-        public bool UpdateChannelConfiguration(Rhs2116ProbeGroup channelConfiguration)
-        {
-            if (channelConfiguration == null || ChannelConfiguration.NumberOfContacts != 32)
-            {
-                return false;
-            }
-
-            if (ChannelConfiguration == channelConfiguration)
-            {
-                return true;
-            }
-
-            ChannelConfiguration = channelConfiguration;
-
-            DrawChannels();
-
-            VisualizeSelectedChannels();
-            DrawStimulusWaveform();
-
-            return true;
         }
     }
 }

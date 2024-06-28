@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.zedGraphWaveform = new ZedGraph.ZedGraphControl();
             this.linkLabelDocumentation = new System.Windows.Forms.LinkLabel();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
@@ -69,16 +68,18 @@
             this.propertyGridStimulusSequence = new System.Windows.Forms.PropertyGrid();
             this.tabControlVisualization = new System.Windows.Forms.TabControl();
             this.tabPageWaveform = new System.Windows.Forms.TabPage();
+            this.zedGraphWaveform = new ZedGraph.ZedGraphControl();
             this.tabPageTable = new System.Windows.Forms.TabPage();
             this.dataGridViewStimulusTable = new System.Windows.Forms.DataGridView();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.menuStrip = new System.Windows.Forms.MenuStrip();
-            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
-            this.zedGraphChannels = new ZedGraph.ZedGraphControl();
+            this.panelProbe = new System.Windows.Forms.Panel();
+            this.menuStrip = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stimulusWaveformToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip.SuspendLayout();
             this.panelButtons.SuspendLayout();
             this.tabControlParameters.SuspendLayout();
@@ -95,7 +96,6 @@
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            this.menuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
@@ -104,31 +104,14 @@
             this.splitContainer3.Panel1.SuspendLayout();
             this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
+            this.menuStrip.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // zedGraphWaveform
-            // 
-            this.zedGraphWaveform.AutoScroll = true;
-            this.zedGraphWaveform.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.zedGraphWaveform.Location = new System.Drawing.Point(3, 3);
-            this.zedGraphWaveform.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
-            this.zedGraphWaveform.Name = "zedGraphWaveform";
-            this.zedGraphWaveform.ScrollGrace = 0D;
-            this.zedGraphWaveform.ScrollMaxX = 0D;
-            this.zedGraphWaveform.ScrollMaxY = 0D;
-            this.zedGraphWaveform.ScrollMaxY2 = 0D;
-            this.zedGraphWaveform.ScrollMinX = 0D;
-            this.zedGraphWaveform.ScrollMinY = 0D;
-            this.zedGraphWaveform.ScrollMinY2 = 0D;
-            this.zedGraphWaveform.Size = new System.Drawing.Size(1316, 788);
-            this.zedGraphWaveform.TabIndex = 4;
-            this.zedGraphWaveform.UseExtendedPrintDialog = true;
             // 
             // linkLabelDocumentation
             // 
             this.linkLabelDocumentation.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.linkLabelDocumentation.AutoSize = true;
-            this.linkLabelDocumentation.Location = new System.Drawing.Point(1677, 865);
+            this.linkLabelDocumentation.Location = new System.Drawing.Point(1516, 877);
             this.linkLabelDocumentation.Name = "linkLabelDocumentation";
             this.linkLabelDocumentation.Size = new System.Drawing.Size(118, 20);
             this.linkLabelDocumentation.TabIndex = 4;
@@ -141,7 +124,7 @@
             this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonCancel.Location = new System.Drawing.Point(322, 11);
+            this.buttonCancel.Location = new System.Drawing.Point(319, 13);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(140, 42);
             this.buttonCancel.TabIndex = 0;
@@ -154,10 +137,10 @@
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusIsValid,
             this.toolStripStatusSlotsUsed});
-            this.statusStrip.Location = new System.Drawing.Point(0, 860);
+            this.statusStrip.Location = new System.Drawing.Point(0, 872);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Padding = new System.Windows.Forms.Padding(2, 0, 14, 0);
-            this.statusStrip.Size = new System.Drawing.Size(1803, 32);
+            this.statusStrip.Size = new System.Drawing.Size(1642, 32);
             this.statusStrip.SizingGrip = false;
             this.statusStrip.TabIndex = 1;
             this.statusStrip.Text = "statusStrip1";
@@ -188,14 +171,14 @@
             this.panelButtons.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelButtons.Location = new System.Drawing.Point(0, 0);
             this.panelButtons.Name = "panelButtons";
-            this.panelButtons.Size = new System.Drawing.Size(469, 62);
+            this.panelButtons.Size = new System.Drawing.Size(466, 64);
             this.panelButtons.TabIndex = 0;
             // 
             // buttonOk
             // 
             this.buttonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonOk.Location = new System.Drawing.Point(173, 11);
+            this.buttonOk.Location = new System.Drawing.Point(170, 13);
             this.buttonOk.Name = "buttonOk";
             this.buttonOk.Size = new System.Drawing.Size(140, 42);
             this.buttonOk.TabIndex = 4;
@@ -211,7 +194,7 @@
             this.tabControlParameters.Location = new System.Drawing.Point(0, 0);
             this.tabControlParameters.Name = "tabControlParameters";
             this.tabControlParameters.SelectedIndex = 0;
-            this.tabControlParameters.Size = new System.Drawing.Size(469, 340);
+            this.tabControlParameters.Size = new System.Drawing.Size(466, 384);
             this.tabControlParameters.TabIndex = 1;
             // 
             // tabPageAddPulse
@@ -220,7 +203,7 @@
             this.tabPageAddPulse.Location = new System.Drawing.Point(4, 29);
             this.tabPageAddPulse.Name = "tabPageAddPulse";
             this.tabPageAddPulse.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageAddPulse.Size = new System.Drawing.Size(461, 307);
+            this.tabPageAddPulse.Size = new System.Drawing.Size(458, 351);
             this.tabPageAddPulse.TabIndex = 0;
             this.tabPageAddPulse.Text = "Add Pulses";
             this.tabPageAddPulse.UseVisualStyleBackColor = true;
@@ -248,7 +231,7 @@
             this.panelParameters.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelParameters.Location = new System.Drawing.Point(3, 3);
             this.panelParameters.Name = "panelParameters";
-            this.panelParameters.Size = new System.Drawing.Size(455, 301);
+            this.panelParameters.Size = new System.Drawing.Size(452, 345);
             this.panelParameters.TabIndex = 0;
             // 
             // groupBoxCathode
@@ -511,7 +494,7 @@
             this.tabPageEditorDialog.Location = new System.Drawing.Point(4, 29);
             this.tabPageEditorDialog.Name = "tabPageEditorDialog";
             this.tabPageEditorDialog.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageEditorDialog.Size = new System.Drawing.Size(461, 307);
+            this.tabPageEditorDialog.Size = new System.Drawing.Size(391, 282);
             this.tabPageEditorDialog.TabIndex = 2;
             this.tabPageEditorDialog.Text = "EditorDialog";
             this.tabPageEditorDialog.UseVisualStyleBackColor = true;
@@ -521,7 +504,7 @@
             this.propertyGridStimulusSequence.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGridStimulusSequence.Location = new System.Drawing.Point(3, 3);
             this.propertyGridStimulusSequence.Name = "propertyGridStimulusSequence";
-            this.propertyGridStimulusSequence.Size = new System.Drawing.Size(455, 301);
+            this.propertyGridStimulusSequence.Size = new System.Drawing.Size(385, 276);
             this.propertyGridStimulusSequence.TabIndex = 4;
             this.propertyGridStimulusSequence.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.PropertyGridStimulusSequence_PropertyValueChanged);
             // 
@@ -530,10 +513,10 @@
             this.tabControlVisualization.Controls.Add(this.tabPageWaveform);
             this.tabControlVisualization.Controls.Add(this.tabPageTable);
             this.tabControlVisualization.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControlVisualization.Location = new System.Drawing.Point(0, 33);
+            this.tabControlVisualization.Location = new System.Drawing.Point(0, 0);
             this.tabControlVisualization.Name = "tabControlVisualization";
             this.tabControlVisualization.SelectedIndex = 0;
-            this.tabControlVisualization.Size = new System.Drawing.Size(1330, 827);
+            this.tabControlVisualization.Size = new System.Drawing.Size(1172, 839);
             this.tabControlVisualization.TabIndex = 6;
             // 
             // tabPageWaveform
@@ -542,10 +525,28 @@
             this.tabPageWaveform.Location = new System.Drawing.Point(4, 29);
             this.tabPageWaveform.Name = "tabPageWaveform";
             this.tabPageWaveform.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageWaveform.Size = new System.Drawing.Size(1322, 794);
+            this.tabPageWaveform.Size = new System.Drawing.Size(1164, 806);
             this.tabPageWaveform.TabIndex = 0;
             this.tabPageWaveform.Text = "Stimulus Waveform";
             this.tabPageWaveform.UseVisualStyleBackColor = true;
+            // 
+            // zedGraphWaveform
+            // 
+            this.zedGraphWaveform.AutoScroll = true;
+            this.zedGraphWaveform.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.zedGraphWaveform.Location = new System.Drawing.Point(3, 3);
+            this.zedGraphWaveform.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
+            this.zedGraphWaveform.Name = "zedGraphWaveform";
+            this.zedGraphWaveform.ScrollGrace = 0D;
+            this.zedGraphWaveform.ScrollMaxX = 0D;
+            this.zedGraphWaveform.ScrollMaxY = 0D;
+            this.zedGraphWaveform.ScrollMaxY2 = 0D;
+            this.zedGraphWaveform.ScrollMinX = 0D;
+            this.zedGraphWaveform.ScrollMinY = 0D;
+            this.zedGraphWaveform.ScrollMinY2 = 0D;
+            this.zedGraphWaveform.Size = new System.Drawing.Size(1158, 800);
+            this.zedGraphWaveform.TabIndex = 4;
+            this.zedGraphWaveform.UseExtendedPrintDialog = true;
             // 
             // tabPageTable
             // 
@@ -553,7 +554,7 @@
             this.tabPageTable.Location = new System.Drawing.Point(4, 29);
             this.tabPageTable.Name = "tabPageTable";
             this.tabPageTable.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageTable.Size = new System.Drawing.Size(1322, 794);
+            this.tabPageTable.Size = new System.Drawing.Size(1125, 671);
             this.tabPageTable.TabIndex = 1;
             this.tabPageTable.Text = "Table";
             this.tabPageTable.UseVisualStyleBackColor = true;
@@ -570,7 +571,7 @@
             this.dataGridViewStimulusTable.Name = "dataGridViewStimulusTable";
             this.dataGridViewStimulusTable.RowHeadersWidth = 62;
             this.dataGridViewStimulusTable.RowTemplate.Height = 28;
-            this.dataGridViewStimulusTable.Size = new System.Drawing.Size(1316, 788);
+            this.dataGridViewStimulusTable.Size = new System.Drawing.Size(1119, 665);
             this.dataGridViewStimulusTable.TabIndex = 0;
             this.dataGridViewStimulusTable.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridViewStimulusTable_CellEndEdit);
             this.dataGridViewStimulusTable.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.DataGridViewStimulusTable_DataBindingComplete);
@@ -578,55 +579,19 @@
             // splitContainer1
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer1.Location = new System.Drawing.Point(0, 33);
             this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
             // 
             this.splitContainer1.Panel1.Controls.Add(this.tabControlVisualization);
-            this.splitContainer1.Panel1.Controls.Add(this.menuStrip);
             // 
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
-            this.splitContainer1.Size = new System.Drawing.Size(1803, 860);
-            this.splitContainer1.SplitterDistance = 1330;
+            this.splitContainer1.Size = new System.Drawing.Size(1642, 839);
+            this.splitContainer1.SplitterDistance = 1172;
             this.splitContainer1.TabIndex = 6;
-            // 
-            // menuStrip
-            // 
-            this.menuStrip.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
-            this.menuStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
-            this.menuStrip.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(1330, 33);
-            this.menuStrip.TabIndex = 7;
-            this.menuStrip.Text = "menuStrip1";
-            // 
-            // fileToolStripMenuItem
-            // 
-            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openFileToolStripMenuItem,
-            this.saveFileToolStripMenuItem});
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(54, 29);
-            this.fileToolStripMenuItem.Text = "File";
-            // 
-            // openFileToolStripMenuItem
-            // 
-            this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
-            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(189, 34);
-            this.openFileToolStripMenuItem.Text = "Open File";
-            this.openFileToolStripMenuItem.Click += new System.EventHandler(this.MenuItemLoadFile_Click);
-            // 
-            // saveFileToolStripMenuItem
-            // 
-            this.saveFileToolStripMenuItem.Name = "saveFileToolStripMenuItem";
-            this.saveFileToolStripMenuItem.Size = new System.Drawing.Size(189, 34);
-            this.saveFileToolStripMenuItem.Text = "Save File";
-            this.saveFileToolStripMenuItem.Click += new System.EventHandler(this.MenuItemSaveFile_Click);
             // 
             // splitContainer2
             // 
@@ -643,8 +608,8 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.panelButtons);
-            this.splitContainer2.Size = new System.Drawing.Size(469, 860);
-            this.splitContainer2.SplitterDistance = 793;
+            this.splitContainer2.Size = new System.Drawing.Size(466, 839);
+            this.splitContainer2.SplitterDistance = 770;
             this.splitContainer2.SplitterWidth = 5;
             this.splitContainer2.TabIndex = 0;
             // 
@@ -657,39 +622,67 @@
             // 
             // splitContainer3.Panel1
             // 
-            this.splitContainer3.Panel1.Controls.Add(this.zedGraphChannels);
+            this.splitContainer3.Panel1.Controls.Add(this.panelProbe);
             // 
             // splitContainer3.Panel2
             // 
             this.splitContainer3.Panel2.Controls.Add(this.tabControlParameters);
             this.splitContainer3.Panel2MinSize = 315;
-            this.splitContainer3.Size = new System.Drawing.Size(469, 793);
-            this.splitContainer3.SplitterDistance = 445;
+            this.splitContainer3.Size = new System.Drawing.Size(466, 770);
+            this.splitContainer3.SplitterDistance = 378;
             this.splitContainer3.SplitterWidth = 8;
             this.splitContainer3.TabIndex = 0;
             // 
-            // zedGraphChannels
+            // panelProbe
             // 
-            this.zedGraphChannels.AutoSize = true;
-            this.zedGraphChannels.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.zedGraphChannels.Location = new System.Drawing.Point(0, 0);
-            this.zedGraphChannels.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
-            this.zedGraphChannels.Name = "zedGraphChannels";
-            this.zedGraphChannels.ScrollGrace = 0D;
-            this.zedGraphChannels.ScrollMaxX = 0D;
-            this.zedGraphChannels.ScrollMaxY = 0D;
-            this.zedGraphChannels.ScrollMaxY2 = 0D;
-            this.zedGraphChannels.ScrollMinX = 0D;
-            this.zedGraphChannels.ScrollMinY = 0D;
-            this.zedGraphChannels.ScrollMinY2 = 0D;
-            this.zedGraphChannels.Size = new System.Drawing.Size(469, 445);
-            this.zedGraphChannels.TabIndex = 3;
-            this.zedGraphChannels.UseExtendedPrintDialog = true;
-            this.zedGraphChannels.MouseDownEvent += new ZedGraph.ZedGraphControl.ZedMouseEventHandler(this.ZedGraphChannels_MouseDownEvent);
-            this.zedGraphChannels.MouseUpEvent += new ZedGraph.ZedGraphControl.ZedMouseEventHandler(this.ZedGraphChannels_MouseUpEvent);
-            this.zedGraphChannels.MouseMoveEvent += new ZedGraph.ZedGraphControl.ZedMouseEventHandler(this.ZedGraphChannels_MouseMoveEvent);
-            this.zedGraphChannels.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ZedGraphChannels_MouseClick);
-            this.zedGraphChannels.Resize += new System.EventHandler(this.ZedGraphChannels_Resize);
+            this.panelProbe.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelProbe.Location = new System.Drawing.Point(0, 0);
+            this.panelProbe.Name = "panelProbe";
+            this.panelProbe.Size = new System.Drawing.Size(466, 378);
+            this.panelProbe.TabIndex = 0;
+            // 
+            // menuStrip
+            // 
+            this.menuStrip.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
+            this.menuStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem});
+            this.menuStrip.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip.Name = "menuStrip";
+            this.menuStrip.Size = new System.Drawing.Size(1642, 33);
+            this.menuStrip.TabIndex = 7;
+            this.menuStrip.Text = "menuStrip1";
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.stimulusWaveformToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(54, 29);
+            this.fileToolStripMenuItem.Text = "File";
+            // 
+            // stimulusWaveformToolStripMenuItem
+            // 
+            this.stimulusWaveformToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openFileToolStripMenuItem,
+            this.saveFileToolStripMenuItem});
+            this.stimulusWaveformToolStripMenuItem.Name = "stimulusWaveformToolStripMenuItem";
+            this.stimulusWaveformToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.stimulusWaveformToolStripMenuItem.Text = "Stimulus Waveform";
+            // 
+            // openFileToolStripMenuItem
+            // 
+            this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
+            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.openFileToolStripMenuItem.Text = "Open File";
+            this.openFileToolStripMenuItem.Click += new System.EventHandler(this.MenuItemLoadFile_Click);
+            // 
+            // saveFileToolStripMenuItem
+            // 
+            this.saveFileToolStripMenuItem.Name = "saveFileToolStripMenuItem";
+            this.saveFileToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.saveFileToolStripMenuItem.Text = "Save File";
+            this.saveFileToolStripMenuItem.Click += new System.EventHandler(this.MenuItemSaveFile_Click);
             // 
             // Rhs2116StimulusSequenceDialog
             // 
@@ -697,8 +690,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(1803, 892);
+            this.ClientSize = new System.Drawing.Size(1642, 904);
             this.Controls.Add(this.splitContainer1);
+            this.Controls.Add(this.menuStrip);
             this.Controls.Add(this.linkLabelDocumentation);
             this.Controls.Add(this.statusStrip);
             this.MainMenuStrip = this.menuStrip;
@@ -722,22 +716,20 @@
             this.tabPageTable.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewStimulusTable)).EndInit();
             this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            this.menuStrip.ResumeLayout(false);
-            this.menuStrip.PerformLayout();
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel2.ResumeLayout(false);
             this.splitContainer2.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             this.splitContainer3.Panel1.ResumeLayout(false);
-            this.splitContainer3.Panel1.PerformLayout();
             this.splitContainer3.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
+            this.menuStrip.ResumeLayout(false);
+            this.menuStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -748,7 +740,6 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusIsValid;
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.LinkLabel linkLabelDocumentation;
-        private ZedGraph.ZedGraphControl zedGraphWaveform;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusSlotsUsed;
         private System.Windows.Forms.Panel panelButtons;
         private System.Windows.Forms.Button buttonOk;
@@ -774,7 +765,6 @@
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.SplitContainer splitContainer3;
-        private ZedGraph.ZedGraphControl zedGraphChannels;
         private System.Windows.Forms.DataGridView dataGridViewStimulusTable;
         private System.Windows.Forms.Panel panelParameters;
         private System.Windows.Forms.Label labelStepSizeAmplitude;
@@ -792,6 +782,9 @@
         private System.Windows.Forms.GroupBox groupBoxAnode;
         private System.Windows.Forms.MenuStrip menuStrip;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private ZedGraph.ZedGraphControl zedGraphWaveform;
+        private System.Windows.Forms.Panel panelProbe;
+        private System.Windows.Forms.ToolStripMenuItem stimulusWaveformToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveFileToolStripMenuItem;
     }

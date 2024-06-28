@@ -6,7 +6,6 @@ namespace OpenEphys.Onix.Design
 {
     public partial class HeadstageRhs2116Dialog : Form
     {
-        readonly ChannelConfigurationDialog ChannelConfigurationDialog;
         readonly Rhs2116StimulusSequenceDialog StimulusSequenceDialog;
         readonly Rhs2116Dialog Rhs2116Dialog;
 
@@ -18,19 +17,6 @@ namespace OpenEphys.Onix.Design
             InitializeComponent();
 
             ChannelConfiguration = new Rhs2116ProbeGroup(channelConfiguration);
-
-            ChannelConfigurationDialog = new ChannelConfigurationDialog(ChannelConfiguration)
-            {
-                TopLevel = false,
-                FormBorderStyle = FormBorderStyle.None,
-                Dock = DockStyle.Fill,
-                Parent = this,
-            };
-
-            tabPageChannelConfiguration.Controls.Add(ChannelConfigurationDialog);
-            AddMenuItemsFromDialog(ChannelConfigurationDialog, "Channel Configuration");
-
-            ChannelConfigurationDialog.Show();
 
             StimulusSequenceDialog = new Rhs2116StimulusSequenceDialog(sequence, channelConfiguration)
             {
@@ -59,26 +45,10 @@ namespace OpenEphys.Onix.Design
 
         private void OnClickOK(object sender, EventArgs e)
         {
-            ChannelConfiguration = ChannelConfigurationDialog.ChannelConfiguration;
-
             if (Rhs2116StimulusSequenceDialog.CanCloseForm(StimulusSequenceDialog.Sequence, out DialogResult result))
             {
                 DialogResult = result;
                 Close();
-            }
-        }
-
-        private void OnClickCancel(object sender, EventArgs e)
-        {
-            DialogResult = DialogResult.Cancel;
-            Close();
-        }
-
-        private void TabPage_Selected(object sender, TabControlEventArgs e)
-        {
-            if (e.TabPage == tabPageStimulusSequence)
-            {
-                UpdateChannelConfiguration(sender, e);
             }
         }
 
@@ -101,19 +71,6 @@ namespace OpenEphys.Onix.Design
                         this.menuStrip.Items.AddRange(new ToolStripItem[] { toolStripMenuItem });
                     }
                 }
-            }
-        }
-
-        private void UpdateChannelConfiguration(object sender, EventArgs e)
-        {
-            if (tabControl.SelectedTab != tabPageStimulusSequence)
-            {
-                return;
-            }
-
-            if (!StimulusSequenceDialog.UpdateChannelConfiguration(ChannelConfigurationDialog.ChannelConfiguration))
-            {
-                MessageBox.Show("Warning: Channel configuration was not updated for the stimulus sequence tab.");
             }
         }
     }

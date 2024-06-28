@@ -22,7 +22,7 @@ namespace OpenEphys.Onix
                     new(
                         ProbeNdim._2,
                         ProbeSiUnits.Mm,
-                        new ProbeAnnotations("", ""),
+                        new ProbeAnnotations("Rhs2116A", ""),
                         new ContactAnnotations(new string[0]),
                         DefaultContactPositions(NumberOfChannelsPerProbe, 0),
                         Probe.DefaultContactPlaneAxes(NumberOfChannelsPerProbe),
@@ -35,7 +35,7 @@ namespace OpenEphys.Onix
                     new(
                         ProbeNdim._2,
                         ProbeSiUnits.Mm,
-                        new ProbeAnnotations("", ""),
+                        new ProbeAnnotations("Rhs2116B", ""),
                         new ContactAnnotations(new string[0]),
                         DefaultContactPositions(NumberOfChannelsPerProbe, 1),
                         Probe.DefaultContactPlaneAxes(NumberOfChannelsPerProbe),

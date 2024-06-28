@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing.Design;
 using System.Text;
 using System.Threading;
 using Bonsai;
@@ -10,7 +9,7 @@ using System.Xml.Serialization;
 
 namespace OpenEphys.Onix
 {
-    [DefaultProperty(nameof(ChannelConfiguration))]
+    [Editor("OpenEphys.Onix.Design.HeadstageRhs2116Editor, OpenEphys.Onix.Design", typeof(ComponentEditor))]
     public class ConfigureHeadstageRhs2116 : HubDeviceFactory
     {
         PortName port;
@@ -63,7 +62,8 @@ namespace OpenEphys.Onix
         }
 
         [XmlIgnore]
-        [Editor("OpenEphys.Onix.Design.HeadstageRhs2116Editor, OpenEphys.Onix.Design", typeof(UITypeEditor))]
+        [Category(ConfigurationCategory)]
+        [Description("Defines the physical channel configuration")]
         public Rhs2116ProbeGroup ChannelConfiguration
         {
             get { return probeGroup; }
